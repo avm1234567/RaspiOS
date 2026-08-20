@@ -1,0 +1,9 @@
+#include <stdio.h>
+#include "uart.h"
+void kernel_main() {
+
+uart_putc('A');
+    while (1) {
+
+    }
+}
