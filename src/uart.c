@@ -28,3 +28,24 @@ void uart_puts(char *msg)
 	msg[i] = '\0';
 }
 
+char uart_getc(void)
+{
+	while(*(volatile uint32_t*)UART_FR & UART_RXFE);
+	return *(volatile uint32_t*)UART_DR;
+}
+
+void uart_gets(char *msg)
+{
+	char ch;
+	while(1)
+	{
+		ch = uart_getc();
+		if(ch == '\r')
+		{
+			break;
+		}
+		*msg = ch;
+		msg++;
+	}
+	*msg = '\0';
+}
