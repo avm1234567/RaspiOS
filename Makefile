@@ -11,6 +11,9 @@ all :	kernel8.img
 clean :
 	rm -rf $(BUILD_DIR) *.img 
 
+run : kernel8.img
+	qemu-system-aarch64 -M raspi4b -kernel kernel8.img -display none -serial stdio -monitor none
+
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
