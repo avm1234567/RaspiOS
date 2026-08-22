@@ -17,3 +17,14 @@ void uart_putc(char c)
 	*(volatile uint32_t*)UART_DR = c;
 }
 
+void uart_puts(char *msg)
+{
+	int i = 0;
+	while(msg[i] != '\0')
+	{
+		uart_putc(msg[i]);
+		i++;
+	}
+	msg[i] = '\0';
+}
+
