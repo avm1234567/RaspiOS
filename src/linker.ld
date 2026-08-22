@@ -1,3 +1,5 @@
+ENTRY(_start)
+
 SECTIONS
 {
     . = 0x80000;
@@ -7,10 +9,12 @@ SECTIONS
     .rodata    : { *(.rodata) }
     .data      : { *(.data) }
 
+    . = ALIGN(16);
     bss_begin = .;
-    .bss : { *(.bss) }
+    .bss : { *(.bss*) *(COMMON) }
     bss_end = .;
 
+    . = ALIGN(16);
     . = . + 0x4000;
     stack_top = .;
 }

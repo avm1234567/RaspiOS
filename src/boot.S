@@ -12,4 +12,15 @@ b proc_hang         // Infinite loop for other CPUs
 master:
 ldr x0, =stack_top  // Load the stack_top address into x0
 mov sp,x0           
+
+// Zero the BSS section
+ldr x0, =bss_begin
+ldr x1, =bss_end
+1:  cmp x0, x1
+    b.ge 2f
+    str xzr, [x0], #8
+    b 1b
+2:
+
 bl kernel_main  
+b proc_hang         // If kernel_main returns, hang
