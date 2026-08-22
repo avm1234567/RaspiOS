@@ -1,7 +1,7 @@
 #ifndef UART_H
 #define UART_H
 
-#define UART0_BASE 0x3f201000
+#define UART0_BASE 0xFE201000
 #define UART_DR (UART0_BASE + 0x00)
 #define UART_FR (UART0_BASE + 0x18)
 #define UART_CR (UART0_BASE + 0x30)
