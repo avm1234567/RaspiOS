@@ -13,11 +13,14 @@
 #define UART_TXE (1<<8)
 #define UART_RXE (1<<9)
 #define UART_TXFF (1<<5)
+#define UART_RXFE (1<<4)
 #define UART_FEN (1<<4)
 #define UART_WLEN_8BIT (3<<5)
 
 void uart_init(void);
 void uart_putc(char c);
 void uart_puts(char *msg);
+char uart_getc(void);
+void uart_gets(char *msg);
 
 #endif
