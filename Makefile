@@ -1,7 +1,7 @@
 ARMGNU ?= aarch64-linux-gnu
 
-COPS = -Wall -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
-ASMOPS = -Iinclude 
+COPS = -g -Wall -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
+ASMOPS = -g -Iinclude
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -9,7 +9,7 @@ SRC_DIR = src
 all :	kernel8.img
 
 clean :
-	rm -rf $(BUILD_DIR) *.img 
+	rm -rf $(BUILD_DIR) *.img
 
 run : kernel8.img
 	qemu-system-aarch64 -M raspi4b -kernel kernel8.img -display none -serial stdio -monitor none
