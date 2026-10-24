@@ -3,15 +3,18 @@
 
 #include "base.h"
 
-#define TIMER_BASE (PERIPHERAL_BASE + 0x1800000)
+#define GIC_BASE (PERIPHERAL_BASE + 0x1840000)
+#define GICD_BASE (GIC_BASE + 0x1000)
+#define GICC_BASE (GIC_BASE + 0x2000)
 
-#define TIMER_CNTRL0 (TIMER_BASE + 0X40)
-#define TIMER_CNTRL1 (TIMER_BASE + 0X44)
-#define TIMER_CNTRL2 (TIMER_BASE + 0X48)
-#define TIMER_CNTRL3 (TIMER_BASE + 0X4C)
+#define  GICD_CTLR  (GICD_BASE + 0x000)
+#define GICD_ISENABLER0  (GICD_BASE + 0x100)
+#define GICC_CTLR  (GICC_BASE + 0x000)
+#define GICC_PMR  (GICC_BASE + 0x004)
+#define GICC_IAR  (GICC_BASE + 0x00C)
+#define GICC_EOIR  (GICC_BASE + 0x010)
 
-#define CNT_V_IRQ (1 << 3)
-
+#define TIMER_IRQ_ID 26
 void timer_init(void);
 void handle_irq(void);
 
