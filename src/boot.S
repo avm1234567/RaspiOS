@@ -22,7 +22,7 @@ ldr x1, =bss_end
     b 1b
 2:
 
-ldr x0, =vectors     // Load the address of the exception vector table
-msr vbar_el1, x0      // Set the vector base address register
-bl kernel_main  
-b proc_hang         // If kernel_main returns, hang
+ldr x0, =vectors
+msr vbar_el2, x0
+bl kernel_main
+b proc_hang
