@@ -1,12 +1,13 @@
 ARMGNU ?= aarch64-linux-gnu
 
-COPS = -g -Wall -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
-ASMOPS = -g -Iinclude
+INCLUDES = -Ikernel/include -Idrivers/include
+COPS = -g -Wall -nostartfiles -ffreestanding $(INCLUDES) -mgeneral-regs-only
+ASMOPS = -g $(INCLUDES)
 
 BUILD_DIR = build
-SRC_DIR = src
+LINKER_SCRIPT = linker/linker.ld
 
-all :	kernel8.img
+all : kernel8.img
 
 clean :
 	rm -rf $(BUILD_DIR) *.img
@@ -14,21 +15,26 @@ clean :
 run : kernel8.img
 	qemu-system-aarch64 -M raspi4b -kernel kernel8.img -display none -serial stdio -monitor none
 
-$(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
+# Source files across all modules
+C_FILES   = $(wildcard drivers/src/*.c) $(wildcard kernel/src/*.c)
+ASM_FILES = $(wildcard boot/*.S) $(wildcard irq/*.S)
+
+# Object files mapping into build/
+C_OBJS    = $(patsubst %.c, $(BUILD_DIR)/%_c.o, $(C_FILES))
+ASM_OBJS  = $(patsubst %.S, $(BUILD_DIR)/%_s.o, $(ASM_FILES))
+OBJ_FILES = $(C_OBJS) $(ASM_OBJS)
+
+$(BUILD_DIR)/%_c.o: %.c
 	mkdir -p $(@D)
 	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
 
-$(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
+$(BUILD_DIR)/%_s.o: %.S
+	mkdir -p $(@D)
 	$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
-
-C_FILES = $(wildcard $(SRC_DIR)/*.c)
-ASM_FILES = $(wildcard $(SRC_DIR)/*.S)
-OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
 
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
-kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
-	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+kernel8.img: $(LINKER_SCRIPT) $(OBJ_FILES)
+	$(ARMGNU)-ld -T $(LINKER_SCRIPT) -o $(BUILD_DIR)/kernel8.elf $(OBJ_FILES)
 	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img

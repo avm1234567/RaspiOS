@@ -2,16 +2,9 @@
 #define SCHEDULER_H
 
 #include <stdint.h>
-#define TASK_READY 0
-#define TASK_SLEEPING 1
+#include "task.h"
+
 extern uint64_t system_ticks;
-
-typedef struct {
-    uint64_t sp;
-    volatile int state;
-    uint64_t wakeup_time;
-}TCB;
-
 extern TCB* current_task;
 
 void task_a(void);

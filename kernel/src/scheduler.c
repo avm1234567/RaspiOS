@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "uart.h"
 #include "mutex.h"
+#include "semaphore.h"
 
 // Define private stacks for tasks
 uint64_t task_a_stack[512];
@@ -15,13 +16,16 @@ TCB tcb_b;
 TCB* current_task;
 
 Mutex mutex;
+Semaphore item_sem;
 
 void task_a(void) 
 {
     while (1) {
         mutex_lock(&mutex);
         uart_puts("Task A is running\n");
+        uart_puts("Producing an item...\n");
         mutex_unlock(&mutex);
+        semaphore_post(&item_sem);
         for (volatile int i = 0; i < 1000000; i++); // Delay
         yield(); // Yield control to the scheduler
     }
@@ -32,11 +36,14 @@ void task_b(void)
     while (1) {
         mutex_lock(&mutex);
         uart_puts("Task B is running\n");
+        uart_puts("Consuming an item...\n");
         uart_puts("Task B: going to sleep for 1 ticks...\n");
         mutex_unlock(&mutex);
+        semaphore_wait(&item_sem);
         sleep_ticks(1); // Sleep for 1 ticks
         mutex_lock(&mutex);
         uart_puts("Task B: woke up from sleep!\n");
+        uart_puts("Consumed an item!\n");
         mutex_unlock(&mutex);
     }
 }
@@ -44,6 +51,7 @@ void task_b(void)
 void scheduler_init(void){
     uint64_t *sp_a = &task_a_stack[512];
     mutex_init(&mutex);
+    semaphore_init(&item_sem, 0, 5);
     sp_a = sp_a - 32;
     sp_a[30] = (uint64_t)task_a; // Set the return address to task_a
     sp_a[31] = (uint64_t)task_a; // Set the frame pointer to task_a
